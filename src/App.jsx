@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { FiBarChart2, FiUsers, FiClipboard, FiActivity, FiHome, FiLogOut, FiTrendingUp } from 'react-icons/fi';
+import { FiBarChart2, FiUsers, FiClipboard, FiActivity, FiHome, FiLogOut, FiTrendingUp, FiSun, FiMoon } from 'react-icons/fi';
 import './App.css';
 
 import LoginPage from './pages/LoginPage';
@@ -12,7 +12,7 @@ import ActivityLog from './pages/admin/ActivityLog';
 import EmployeeAnalytics from './pages/admin/EmployeeAnalytics';
 import EmployeePortal from './pages/employee/EmployeePortal';
 
-function Sidebar({ user, onLogout }) {
+function Sidebar({ user, onLogout, theme, toggleTheme }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -53,6 +53,11 @@ function Sidebar({ user, onLogout }) {
         </div>
       </nav>
       <div className="sidebar-footer">
+        <div className="theme-toggle-container" style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+          <button onClick={toggleTheme} className="btn btn-ghost" style={{ width: '100%', justifyContent: 'center' }}>
+            {theme === 'dark' ? <><FiSun size={16} /> Light Mode</> : <><FiMoon size={16} /> Dark Mode</>}
+          </button>
+        </div>
         <div className="sidebar-user">
           <div className="user-avatar">{user.name?.charAt(0)?.toUpperCase() || 'U'}</div>
           <div className="user-info">
@@ -66,10 +71,10 @@ function Sidebar({ user, onLogout }) {
   );
 }
 
-function AppLayout({ user, onLogout }) {
+function AppLayout({ user, onLogout, theme, toggleTheme }) {
   return (
     <div className="app-layout">
-      <Sidebar user={user} onLogout={onLogout} />
+      <Sidebar user={user} onLogout={onLogout} theme={theme} toggleTheme={toggleTheme} />
       <main className="main-content">
         <Routes>
           {user.role === 'admin' ? (
@@ -95,6 +100,12 @@ function AppLayout({ user, onLogout }) {
 
 export default function App() {
   const [user, setUser] = useState(null);
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
@@ -104,14 +115,22 @@ export default function App() {
 
   const handleLogin = (userData) => setUser(userData);
   const handleLogout = () => { localStorage.removeItem('token'); localStorage.removeItem('user'); setUser(null); };
+  const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark');
 
   return (
     <BrowserRouter>
-      <Toaster position="top-right" toastOptions={{ duration: 3000, style: { background: '#1a2035', color: '#e8ecf4', border: '1px solid #2a3555' } }} />
+      <Toaster position="top-right" toastOptions={{ 
+        duration: 3000, 
+        style: { 
+          background: 'var(--bg-card)', 
+          color: 'var(--text-primary)', 
+          border: '1px solid var(--border)' 
+        } 
+      }} />
       {!user ? (
-        <Routes><Route path="*" element={<LoginPage onLogin={handleLogin} />} /></Routes>
+        <Routes><Route path="*" element={<LoginPage onLogin={handleLogin} theme={theme} toggleTheme={toggleTheme} />} /></Routes>
       ) : (
-        <AppLayout user={user} onLogout={handleLogout} />
+        <AppLayout user={user} onLogout={handleLogout} theme={theme} toggleTheme={toggleTheme} />
       )}
     </BrowserRouter>
   );

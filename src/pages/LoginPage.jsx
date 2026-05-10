@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { authAPI } from '../services/api';
-import { FiEye, FiEyeOff, FiShield, FiUser, FiBarChart2 } from 'react-icons/fi';
+import { FiEye, FiEyeOff, FiShield, FiUser, FiBarChart2, FiSun, FiMoon } from 'react-icons/fi';
 
-export default function LoginPage({ onLogin }) {
+export default function LoginPage({ onLogin, theme, toggleTheme }) {
   const [tab, setTab] = useState('admin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,6 +30,9 @@ export default function LoginPage({ onLogin }) {
 
   return (
     <div className="login-page">
+      <button onClick={toggleTheme} className="btn btn-ghost" style={{ position: 'absolute', top: 20, right: 20 }}>
+        {theme === 'dark' ? <><FiSun size={18} /> Light Mode</> : <><FiMoon size={18} /> Dark Mode</>}
+      </button>
       <div className="login-container">
         <div className="login-card">
           <div className="login-header">
@@ -75,11 +78,6 @@ export default function LoginPage({ onLogin }) {
             </button>
           </form>
 
-          {tab === 'admin' && (
-            <p style={{ textAlign: 'center', marginTop: 16, fontSize: 12, color: 'var(--text-muted)' }}>
-              Default: admin@dashboard.com / admin123
-            </p>
-          )}
         </div>
       </div>
     </div>
